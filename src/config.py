@@ -3,7 +3,7 @@ import torch
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 MODELS = {
-    "A": "Qwen/Qwen3-4B",
+    "A": "Qwen/Qwen3-0.6B",
     "B": "Qwen/Qwen3-4B"
 }
 

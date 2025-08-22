@@ -42,6 +42,9 @@ def generate_from_prompt(model, input_ids,
         generated_ids = torch.cat([generated_ids, next_id], dim=-1)
     return generated_ids
 
+# Problem 1: amplifying new behavior
+
+
 @torch.no_grad()
 def generate_guided_two_prompts(model_A, model_B, input_ids_A, input_ids_B,
                                 alpha=0.8, steps=64, temperature=1.0, top_p=0.9):
@@ -69,6 +72,8 @@ def generate_guided_two_prompts(model_A, model_B, input_ids_A, input_ids_B,
         ids_B = torch.cat([ids_B, next_id], dim=-1)
     return ids_B[:, input_ids_B.shape[1]:]
 
+# Problem 1: amplifying new behavior, sentence level
+
 @torch.no_grad()
 def amplify_sentence_difference(model, input_ids_P, input_ids_Q,
                                 alpha=0.8, steps=64, temperature=1.0, top_p=0.9):
@@ -81,10 +86,12 @@ def amplify_sentence_difference(model, input_ids_P, input_ids_Q,
         else:
             out_P = model(input_ids=ids_P[:, -1:], use_cache=True, past_key_values=past_P)
             out_Q = model(input_ids=ids_Q[:, -1:], use_cache=True, past_key_values=past_Q)
+        
         past_P, past_Q = out_P.past_key_values, out_Q.past_key_values
+        # Extracting logits
         logits_P = out_P.logits[:, -1, :]
         logits_Q = out_Q.logits[:, -1, :]
-        steered = (1 + alpha) * logits_Q - alpha * logits_P
+        steered = (1 + alpha) * logits_Q - alpha * logits_P # Steering logits
         
         if temperature != 1.0:
             steered = steered / temperature
